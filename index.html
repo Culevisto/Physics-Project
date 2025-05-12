@@ -163,7 +163,7 @@
 
       let Pstart=0, Pend=0;
 
-      if(proc==='iso'){
+      if(proc==='iso'){ // Изотермический
         pvChart.options.scales.x.title.text = 'V (м³)';
         pvChart.data.datasets[0].label = 'P(V)';
         for(let i=0;i<=STEPS;i++){
@@ -174,7 +174,7 @@
           if(i===0)   Pstart=P;
           if(i===STEPS) Pend=P;
         }
-      } else if(proc==='isoBaric'){
+      } else if(proc==='isoBaric'){ // Изобарный
         pvChart.options.scales.x.title.text = 'V (м³)';
         pvChart.data.datasets[0].label = 'P(V)';
         const P=n*R*T1/V1;
@@ -184,15 +184,20 @@
           pvChart.data.labels.push(V.toFixed(2));
           pvChart.data.datasets[0].data.push(P.toFixed(2));
         }
-      } else { // isoChoric
+      } else { // isoChoric — изохорный процесс
         pvChart.options.scales.x.title.text = 'V (м³)';
         pvChart.data.datasets[0].label = 'P(V)';
-        const P = n*R*T1/V1;
+        const V_fixed = V1;
+        const T_start = T1;
+        const T_end = T1 * 2; // например, удвоим температуру
         for(let i=0;i<=STEPS;i++){
-          pvChart.data.labels.push(V1.toFixed(2));
+          const T = T_start + (T_end - T_start) * (i / STEPS);
+          const P = n * R * T / V_fixed;
+          pvChart.data.labels.push(V_fixed.toFixed(2)); // постоянный объём
           pvChart.data.datasets[0].data.push(P.toFixed(2));
+          if(i===0) Pstart=P;
+          if(i===STEPS) Pend=P;
         }
-        Pstart = Pend = P;
       }
 
       pvChart.update();
